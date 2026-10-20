@@ -135,6 +135,10 @@ dialog.zoom { border: 0; padding: 0; background: transparent; max-width: min(96v
 dialog.zoom::backdrop { background: rgba(8,14,20,.86); }
 dialog.zoom img { display: block; max-width: 100%; max-height: 88vh; border-radius: 8px; background: #FFFFFF; }
 dialog.zoom button { position: absolute; top: 10px; right: 10px; font: 600 .85rem var(--body); background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 6px 12px; cursor: pointer; }
+.org-wrap { position: relative; }
+.media .frame { position: relative; }
+.org-badge, .media .frame img.org-badge, dialog.zoom img.org-badge { position: absolute; top: 10px; left: 10px; z-index: 1; display: block; width: clamp(58px, 13%, 100px); height: auto; max-height: none; object-fit: fill; background: #FFFFFF; padding: 5px 7px; border-radius: 5px; box-shadow: 0 1px 4px rgba(0,0,0,.28); pointer-events: none; }
+dialog.zoom img.org-badge { width: 120px; }
 .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
 .stats div { background: var(--bg); padding: 18px; }
 .stats strong { display: block; font: 800 2rem/1 var(--display); color: var(--accent); font-variant-numeric: tabular-nums; }
@@ -275,11 +279,11 @@ footer { padding-block: 32px 48px; border-top: 1px solid var(--line); font: 400 
           <div class="tags"><span>Python</span><span>PyTorch</span><span>OpenCV</span><span>FastAPI</span><span>GPU inference</span><span>JavaScript</span></div>
         </div>
         <figure class="media video">
-          <video src="media/marinaos.mp4" poster="media/marinaos-poster.jpg" autoplay muted loop playsinline aria-label="MarinaOS 3D view with live boat tracks"></video>
+          <div class="org-wrap"><img class="org-badge" src="media/cmmi-logo.png" alt="Cyprus Marine and Maritime Institute"><video src="media/marinaos.mp4" poster="media/marinaos-poster.jpg" autoplay muted loop playsinline aria-label="MarinaOS 3D view with live boat tracks"></video></div>
           <figcaption>3D view: a drone-survey model of the marina with live boat tracks fused from the PTZ cameras.</figcaption>
         </figure>
         <figure class="media wide">
-          <button type="button" class="frame strip" data-zoom="media/camera.webp" aria-label="Enlarge camera detection view"><img src="media/camera.webp" alt="Satellite map of Agia Napa Marina with projected boat positions beside the camera feed showing tracked boats with IDs and confidence scores" loading="lazy"></button>
+          <button type="button" class="frame strip" data-zoom="media/camera.webp" data-org="1" aria-label="Enlarge camera detection view"><img class="org-badge" src="media/cmmi-logo.png" alt="Cyprus Marine and Maritime Institute"><img src="media/camera.webp" alt="Satellite map of Agia Napa Marina with projected boat positions beside the camera feed showing tracked boats with IDs and confidence scores" loading="lazy"></button>
           <figcaption>Camera 1: tracked boat detections with IDs and confidence, projected onto the satellite map of the marina.</figcaption>
         </figure>
         <div class="stats" aria-label="MarinaOS key figures">
@@ -292,7 +296,7 @@ footer { padding-block: 32px 48px; border-top: 1px solid var(--line); font: 400 
 
       <article class="proj">
         <figure class="media">
-          <button type="button" class="frame cover" data-zoom="media/arms.webp" aria-label="Enlarge ARMS segmentation figure"><img src="media/arms.webp" alt="ARMS plate from Crete with 1,010 segmented organisms coloured by class" loading="lazy"></button>
+          <button type="button" class="frame cover" data-zoom="media/arms.webp" data-org="1" aria-label="Enlarge ARMS segmentation figure"><img class="org-badge" src="media/cmmi-logo.png" alt="Cyprus Marine and Maritime Institute"><img src="media/arms.webp" alt="ARMS plate from Crete with 1,010 segmented organisms coloured by class" loading="lazy"></button>
           <figcaption>Consensus annotation of a Crete ARMS plate: 1,010 instances across 18 classes.</figcaption>
         </figure>
         <div class="file">axolotl_arms/</div>
@@ -304,7 +308,7 @@ footer { padding-block: 32px 48px; border-top: 1px solid var(--line); font: 400 
 
       <article class="proj">
         <figure class="media">
-          <button type="button" class="frame" data-zoom="media/berths.webp" aria-label="Enlarge berth localisation figure"><img src="media/berths.webp" alt="Map of Cape Town docks with detected berths as red and blue boxes and satellite crops of moored vessels" loading="lazy"></button>
+          <button type="button" class="frame" data-zoom="media/berths.webp" data-org="1" aria-label="Enlarge berth localisation figure"><img class="org-badge" src="media/cmmi-logo.png" alt="Cyprus Marine and Maritime Institute"><img src="media/berths.webp" alt="Map of Cape Town docks with detected berths as red and blue boxes and satellite crops of moored vessels" loading="lazy"></button>
           <figcaption>Berths found from AIS data in Cape Town's docks, checked against satellite imagery.</figcaption>
         </figure>
         <div class="file">adaptation/</div>
@@ -457,7 +461,7 @@ asyncio
   </footer>
 </div>
 
-<dialog class="zoom" id="zoom"><img id="zoom-img" alt=""><button type="button" id="zoom-close">Close</button></dialog>
+<dialog class="zoom" id="zoom"><img id="zoom-img" alt=""><img class="org-badge" id="zoom-org" src="media/cmmi-logo.png" alt="Cyprus Marine and Maritime Institute" hidden><button type="button" id="zoom-close">Close</button></dialog>
 
 <script>
 (function () {
@@ -465,7 +469,8 @@ asyncio
   document.querySelectorAll('[data-zoom]').forEach(function (b) {
     b.addEventListener('click', function () {
       img.src = b.getAttribute('data-zoom');
-      img.alt = b.querySelector('img').alt;
+      img.alt = b.querySelector('img:not(.org-badge)').alt;
+      document.getElementById('zoom-org').hidden = !b.hasAttribute('data-org');
       if (dlg.showModal) dlg.showModal();
     });
   });
